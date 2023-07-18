@@ -4,6 +4,7 @@ export const PARAMETER_SHARE_NETWORK = 'share=network';
 export const PARAMETER_SHARE_NFT = 'share=nft';
 export const PARAMETER_SIGN_MESSAGE = 'sign=message';
 export const PARAMETER_SUBMIT_TRANSACTION = 'submit=transaction';
+export const PARAMETER_SUBMIT_TRANSACTIONS_BULK = 'submit=txBulk';
 export const PARAMETER_TRANSACTION_ACCEPT_NFT_OFFER = 'transaction=acceptNFTOffer';
 export const PARAMETER_TRANSACTION_BURN_NFT = 'transaction=burnNFT';
 export const PARAMETER_TRANSACTION_PAYMENT = 'transaction=payment';

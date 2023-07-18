@@ -29,6 +29,7 @@ export * from './ShareNFT';
 export * from './SharePublicKey';
 export * from './SignMessage';
 export * from './SubmitTransaction';
+export * from './SubmitTransactionsBulk';
 export * from './Transaction';
 export * from './TrustedApps';
 export * from './Welcome';

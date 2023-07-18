@@ -38,7 +38,8 @@ import {
   SendPaymentRequest,
   SetAccountRequest,
   SetTrustlineRequest,
-  SubmitTransactionRequest
+  SubmitTransactionRequest,
+  SubmitTransactionsBulkRequest
 } from '@gemwallet/constants';
 
 import { AccountTransaction, WalletLedger } from '../../types';
@@ -88,6 +89,10 @@ interface NFTImageRequest {
   NFT: AccountNFToken;
 }
 
+interface SubmitTransactionsBulkResponse {
+  txResults: Array<{ txID: number; hash?: string; error?: Error }>;
+}
+
 export const LEDGER_CONNECTION_ERROR = 'You need to be connected to a ledger to make a transaction';
 
 export interface LedgerContextType {
@@ -108,6 +113,9 @@ export interface LedgerContextType {
   createOffer: (payload: CreateOfferRequest) => Promise<CreateOfferResponse>;
   cancelOffer: (payload: CancelOfferRequest) => Promise<CancelOfferResponse>;
   submitTransaction: (payload: SubmitTransactionRequest) => Promise<SubmitTransactionResponse>;
+  submitTransactionsBulk: (
+    payload: SubmitTransactionsBulkRequest
+  ) => Promise<SubmitTransactionsBulkResponse>;
   getAccountInfo: () => Promise<AccountInfoResponse>;
   getNFTData: (payload: NFTImageRequest) => Promise<NFTData>;
 }
@@ -138,6 +146,7 @@ const LedgerContext = createContext<LedgerContextType>({
   createOffer: () => new Promise(() => {}),
   cancelOffer: () => new Promise(() => {}),
   submitTransaction: () => new Promise(() => {}),
+  submitTransactionsBulk: () => new Promise(() => {}),
   getAccountInfo: () => new Promise(() => {}),
   getNFTData: () => new Promise(() => {})
 });
@@ -751,6 +760,69 @@ const LedgerProvider: FC = ({ children }) => {
     [client, getCurrentWallet]
   );
 
+  const submitTransactionsBulk = useCallback(
+    async (payload: SubmitTransactionsBulkRequest) => {
+      const wallet = getCurrentWallet();
+      if (!client) {
+        throw new Error('You need to be connected to a ledger');
+      }
+      if (!wallet) {
+        throw new Error('You need to have a wallet connected');
+      } else {
+        let res = [];
+        for (const txWithID of payload.transactions) {
+          try {
+            if (!txWithID.transaction.Account || txWithID.transaction.Account === '') {
+              txWithID.transaction.Account = wallet.publicAddress;
+            }
+
+            // Validate the transaction
+            validate(txWithID.transaction as unknown as Record<string, unknown>);
+            // Prepare the transaction
+            const prepared: Transaction = await client.autofill(txWithID.transaction);
+            // Sign the transaction
+            const signed = wallet.wallet.sign(prepared);
+            // Submit the signed blob
+            const tx = await client.submitAndWait(signed.tx_blob);
+
+            if (!tx.result.hash) {
+              res.push({
+                txID: txWithID.txID,
+                error: new Error("Couldn't submit the transaction")
+              });
+              return { txResults: res };
+            }
+
+            if ((tx.result.meta! as TransactionMetadata).TransactionResult !== 'tesSUCCESS') {
+              res.push({
+                txID: txWithID.txID,
+                error: new Error(
+                  "Couldn't submit the signed transaction but the transaction was successful"
+                )
+              });
+              return { txResults: res };
+            }
+
+            res.push({
+              txID: txWithID.txID,
+              hash: tx.result.hash
+            });
+          } catch (e) {
+            Sentry.captureException(e);
+            res.push({
+              txID: txWithID.txID,
+              error: e as Error
+            });
+            return { txResults: res };
+          }
+        }
+
+        return { txResults: res };
+      }
+    },
+    [client, getCurrentWallet]
+  );
+
   const getAccountInfo = useCallback((): Promise<AccountInfoResponse> => {
     const wallet = getCurrentWallet();
 
@@ -823,6 +895,7 @@ const LedgerProvider: FC = ({ children }) => {
     createOffer,
     cancelOffer,
     submitTransaction,
+    submitTransactionsBulk,
     getAccountInfo,
     getNFTData
   };

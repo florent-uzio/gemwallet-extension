@@ -47,7 +47,9 @@ import {
   PARAMETER_TRANSACTION_CREATE_OFFER,
   PARAMETER_TRANSACTION_SET_ACCOUNT,
   CREATE_OFFER_PATH,
-  CANCEL_OFFER_PATH
+  CANCEL_OFFER_PATH,
+  PARAMETER_SUBMIT_TRANSACTIONS_BULK,
+  SUBMIT_TRANSACTIONS_BULK_PATH
 } from '../../../constants';
 import { useWallet } from '../../../contexts';
 import { useKeyUp } from '../../../hooks/useKeyUp';
@@ -74,6 +76,8 @@ export const Login: FC = () => {
       navigate(`${SIGN_MESSAGE_PATH}${search}`);
     } else if (search.includes(PARAMETER_SUBMIT_TRANSACTION)) {
       navigate(`${SUBMIT_TRANSACTION_PATH}${search}`);
+    } else if (search.includes(PARAMETER_SUBMIT_TRANSACTIONS_BULK)) {
+      navigate(`${SUBMIT_TRANSACTIONS_BULK_PATH}${search}`);
     } else if (search.includes(PARAMETER_TRANSACTION_TRUSTLINE)) {
       navigate(`${ADD_NEW_TRUSTLINE_PATH}${search}`);
     } else if (search.includes(PARAMETER_SHARE_NFT)) {
