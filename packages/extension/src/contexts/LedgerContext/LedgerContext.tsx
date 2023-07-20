@@ -39,7 +39,8 @@ import {
   SetAccountRequest,
   SetTrustlineRequest,
   SubmitTransactionRequest,
-  SubmitTransactionsBulkRequest
+  SubmitTransactionsBulkRequest,
+  TransactionBulkResponse
 } from '@gemwallet/constants';
 
 import { AccountTransaction, WalletLedger } from '../../types';
@@ -90,7 +91,7 @@ interface NFTImageRequest {
 }
 
 interface SubmitTransactionsBulkResponse {
-  txResults: Array<{ txID: number; hash?: string; error?: Error }>;
+  txResults: TransactionBulkResponse[];
 }
 
 export const LEDGER_CONNECTION_ERROR = 'You need to be connected to a ledger to make a transaction';
@@ -771,15 +772,16 @@ const LedgerProvider: FC = ({ children }) => {
       } else {
         let res = [];
         for (const txWithID of payload.transactions) {
+          const { ID, ...payload } = txWithID;
           try {
-            if (!txWithID.transaction.Account || txWithID.transaction.Account === '') {
-              txWithID.transaction.Account = wallet.publicAddress;
+            if (!payload.Account || txWithID.Account === '') {
+              payload.Account = wallet.publicAddress;
             }
 
             // Validate the transaction
-            validate(txWithID.transaction as unknown as Record<string, unknown>);
+            validate(payload as unknown as Record<string, unknown>);
             // Prepare the transaction
-            const prepared: Transaction = await client.autofill(txWithID.transaction);
+            const prepared: Transaction = await client.autofill(payload);
             // Sign the transaction
             const signed = wallet.wallet.sign(prepared);
             // Submit the signed blob
@@ -787,7 +789,7 @@ const LedgerProvider: FC = ({ children }) => {
 
             if (!tx.result.hash) {
               res.push({
-                txID: txWithID.txID,
+                ID,
                 error: new Error("Couldn't submit the transaction")
               });
               return { txResults: res };
@@ -795,7 +797,7 @@ const LedgerProvider: FC = ({ children }) => {
 
             if ((tx.result.meta! as TransactionMetadata).TransactionResult !== 'tesSUCCESS') {
               res.push({
-                txID: txWithID.txID,
+                ID,
                 error: new Error(
                   "Couldn't submit the signed transaction but the transaction was successful"
                 )
@@ -804,13 +806,13 @@ const LedgerProvider: FC = ({ children }) => {
             }
 
             res.push({
-              txID: txWithID.txID,
+              ID,
               hash: tx.result.hash
             });
           } catch (e) {
             Sentry.captureException(e);
             res.push({
-              txID: txWithID.txID,
+              ID,
               error: e as Error
             });
             return { txResults: res };

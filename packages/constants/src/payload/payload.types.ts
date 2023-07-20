@@ -240,10 +240,10 @@ export interface SubmitTransactionRequest {
   transaction: Transaction;
 }
 
-export interface TransactionWithID {
-  txID: number;
-  transaction: Transaction;
-}
+export type TransactionWithID = Transaction & {
+  // Optional ID to identify the transaction in the response, after it has been submitted.
+  ID?: string;
+};
 
 export interface SubmitTransactionsBulkRequest {
   transactions: TransactionWithID[];
@@ -317,12 +317,15 @@ export interface SubmitTransactionResponse
     hash: string;
   }> {}
 
+export type TransactionBulkResponse = {
+  ID?: string;
+  hash?: string;
+  error?: Error;
+};
+
 export interface SubmitTransactionsBulkResponse
   extends BaseResponse<{
-    transactions: Array<{
-      hash?: string;
-      error?: Error;
-    }>;
+    transactions: TransactionBulkResponse[];
   }> {}
 
 export interface IsInstalledResponse {
