@@ -25,6 +25,7 @@ import {
   SHARE_PUBLIC_KEY_PATH,
   SIGN_MESSAGE_PATH,
   SUBMIT_TRANSACTION_PATH,
+  SUBMIT_TRANSACTIONS_BULK_PATH,
   TRANSACTION_PATH,
   TRUSTED_APPS_PATH
 } from '../../../constants';
@@ -52,6 +53,7 @@ import { ShareNFT } from '../ShareNFT';
 import { SharePublicKey } from '../SharePublicKey';
 import { SignMessage } from '../SignMessage';
 import { SubmitTransaction } from '../SubmitTransaction';
+import { SubmitTransactionsBulk } from '../SubmitTransactionsBulk';
 import { Transaction } from '../Transaction';
 import { TrustedApps } from '../TrustedApps';
 
@@ -85,6 +87,7 @@ export const privateRoutes: PrivateRouteConfig[] = [
   { path: SHARE_NFT_PATH, element: ShareNFT },
   { path: SIGN_MESSAGE_PATH, element: SignMessage },
   { path: SUBMIT_TRANSACTION_PATH, element: SubmitTransaction },
+  { path: SUBMIT_TRANSACTIONS_BULK_PATH, element: SubmitTransactionsBulk },
   { path: TRANSACTION_PATH, element: Transaction },
   { path: TRUSTED_APPS_PATH, element: TrustedApps }
 ];
