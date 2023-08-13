@@ -1,14 +1,13 @@
 import { convertHexToString } from 'xrpl';
 
-import { AccountNFToken, NFTData } from '@gemwallet/constants';
+import { NFTData } from '@gemwallet/constants';
 import { IPFSResolverPrefix } from '@gemwallet/constants/src/xrpl/nft.constant';
 
 import { parseJSON } from './NFTViewer';
 
 import { isImageUrl } from '.';
 
-export const resolveNFTData = async (NFT: AccountNFToken): Promise<NFTData> => {
-  const { NFTokenID, URI } = NFT;
+export const resolveNFTData = async (NFTokenID: string, URI?: string): Promise<NFTData> => {
   let URL = URI ? convertHexToString(URI) : '';
 
   if (!URL.length) {
