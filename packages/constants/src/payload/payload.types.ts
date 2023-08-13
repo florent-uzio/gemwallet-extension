@@ -259,7 +259,7 @@ export interface SubmitTransactionsBulkRequest extends BaseTransactionBulkReques
   transactions: TransactionWithID[];
 }
 
-export interface SubmitTransactionsBulkModifiedRequest extends BaseTransactionBulkRequest {
+export interface SubmitTransactionsBulkWithKeysRequest extends BaseTransactionBulkRequest {
   // The key is used to guarantee that the transactions are submitted in the same order as they are in the request.
   transactions: Record<number, TransactionWithID>;
 }
@@ -287,7 +287,7 @@ export type RequestPayload =
   | SignMessageRequest
   | SubmitStorageKeyRequest
   | SubmitTransactionRequest
-  | SubmitTransactionsBulkModifiedRequest;
+  | SubmitTransactionsBulkWithKeysRequest;
 
 /*
  * Response Payloads
