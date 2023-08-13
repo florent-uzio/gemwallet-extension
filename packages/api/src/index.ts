@@ -42,7 +42,8 @@ export type {
   SetAccountRequest,
   SetTrustlineRequest,
   SignMessageRequest,
-  SubmitTransactionRequest
+  SubmitTransactionRequest,
+  SubmitTransactionsBulkRequest
 } from '@gemwallet/constants';
 
 // API response types
@@ -63,5 +64,6 @@ export type {
   SetAccountResponse,
   SetTrustlineResponse,
   SignMessageResponse,
-  SubmitTransactionResponse
+  SubmitTransactionResponse,
+  SubmitTransactionsBulkResponse
 } from '@gemwallet/constants';
