@@ -13,7 +13,7 @@ export const saveInChromeSessionStorage = (key: string, value: any): Promise<voi
         }
       });
     } else {
-      reject(new Error('Not in production environment'));
+      resolve();
     }
   });
 };
@@ -36,7 +36,7 @@ export const loadFromChromeSessionStorage = (
         }
       });
     } else {
-      reject(new Error('Not in production environment'));
+      resolve(null);
     }
   });
 };
@@ -52,7 +52,7 @@ export const deleteFromChromeSessionStorage = (key: string): Promise<void> => {
         }
       });
     } else {
-      reject(new Error('Not in production environment'));
+      resolve();
     }
   });
 };
