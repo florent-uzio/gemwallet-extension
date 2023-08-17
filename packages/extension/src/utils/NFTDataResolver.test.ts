@@ -16,7 +16,7 @@ describe('resolveNFTData', () => {
   });
 
   it('should return NFTokenID and description if URI is empty', async () => {
-    const result = await resolveNFTData('1234');
+    const result = await resolveNFTData({ NFTokenID: '1234' });
     expect(result).toEqual({
       NFTokenID: '1234',
       description: 'No data'
@@ -25,7 +25,10 @@ describe('resolveNFTData', () => {
 
   it('should return NFTokenID and image URL if URL is a PNG image', async () => {
     mockFetch.mockResolvedValue(new Response(JSON.stringify({}), { status: 200 }));
-    const result = await resolveNFTData('1234', convertStringToHex('https://test.com/image.png'));
+    const result = await resolveNFTData({
+      NFTokenID: '1234',
+      URI: convertStringToHex('https://test.com/image.png')
+    });
     expect(result).toEqual({
       NFTokenID: '1234',
       image: 'https://test.com/image.png'
@@ -34,7 +37,10 @@ describe('resolveNFTData', () => {
 
   it('should return NFTokenID and image URL if URL is a JPG image', async () => {
     mockFetch.mockResolvedValue(new Response(JSON.stringify({}), { status: 200 }));
-    const result = await resolveNFTData('1234', convertStringToHex('https://test.com/image.jpg'));
+    const result = await resolveNFTData({
+      NFTokenID: '1234',
+      URI: convertStringToHex('https://test.com/image.jpg')
+    });
     expect(result).toEqual({
       NFTokenID: '1234',
       image: 'https://test.com/image.jpg'
@@ -46,7 +52,10 @@ describe('resolveNFTData', () => {
     (global.fetch as jest.Mock).mockResolvedValue(
       new Response(JSON.stringify({ description: 'Test JSON' }))
     );
-    const result = await resolveNFTData('1234', convertStringToHex('https://test.com/data.json'));
+    const result = await resolveNFTData({
+      NFTokenID: '1234',
+      URI: convertStringToHex('https://test.com/data.json')
+    });
     expect(result).toEqual({
       NFTokenID: '1234',
       description: 'Test JSON',
@@ -58,7 +67,10 @@ describe('resolveNFTData', () => {
     const testJsonUrl = 'https://test.com/data.json';
     (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Fetch failed'));
 
-    const result = await resolveNFTData('1234', convertStringToHex(testJsonUrl));
+    const result = await resolveNFTData({
+      NFTokenID: '1234',
+      URI: convertStringToHex(testJsonUrl)
+    });
 
     expect(result).toEqual({
       NFTokenID: '1234',
@@ -70,7 +82,10 @@ describe('resolveNFTData', () => {
     const testIpfsUrl = `${IPFSResolverPrefix}someHash`;
     (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Fetch failed'));
 
-    const result = await resolveNFTData('1234', convertStringToHex(testIpfsUrl));
+    const result = await resolveNFTData({
+      NFTokenID: '1234',
+      URI: convertStringToHex(testIpfsUrl)
+    });
 
     expect(result).toEqual({
       NFTokenID: '1234',

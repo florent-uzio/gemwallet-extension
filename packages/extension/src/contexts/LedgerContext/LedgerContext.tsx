@@ -962,7 +962,7 @@ const LedgerProvider: FC = ({ children }) => {
 
   const getNFTData = useCallback(async ({ NFT }: NFTImageRequest) => {
     try {
-      return resolveNFTData(NFT.NFTokenID, NFT.URI);
+      return resolveNFTData({ NFTokenID: NFT.NFTokenID, URI: NFT.URI });
     } catch (e) {
       Sentry.captureException(e);
       throw e;

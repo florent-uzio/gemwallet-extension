@@ -7,12 +7,16 @@ import { parseJSON } from './NFTViewer';
 
 import { isImageUrl } from '.';
 
-export const resolveNFTData = async (NFTokenID: string, URI?: string): Promise<NFTData> => {
-  let URL = URI ? convertHexToString(URI) : '';
+export const resolveNFTData = async (data: {
+  NFTokenID?: string;
+  URI?: string;
+}): Promise<NFTData> => {
+  data.NFTokenID = data.NFTokenID || '';
+  let URL = data.URI ? convertHexToString(data.URI) : '';
 
   if (!URL.length) {
     return {
-      NFTokenID,
+      NFTokenID: data.NFTokenID,
       description: 'No data'
     };
   }
@@ -25,7 +29,7 @@ export const resolveNFTData = async (NFTokenID: string, URI?: string): Promise<N
       // Case 1.1 - The URL is directly an image
       await fetch(URL);
       return {
-        NFTokenID,
+        NFTokenID: data.NFTokenID,
         image: URL
       };
     } catch (e) {
@@ -36,7 +40,7 @@ export const resolveNFTData = async (NFTokenID: string, URI?: string): Promise<N
       try {
         await fetch(URL);
         return {
-          NFTokenID,
+          NFTokenID: data.NFTokenID,
           image: URL
         };
       } catch (e) {}
@@ -47,20 +51,20 @@ export const resolveNFTData = async (NFTokenID: string, URI?: string): Promise<N
       await fetch(URL);
       // Case 2.1 - The URL is directly a JSON
       // If it follows the XLS-24 standard, it will be automatically parsed
-      return parseJSON(URL, NFTokenID);
+      return parseJSON(URL, data.NFTokenID);
     } catch (e) {}
     // Case 2.2 - The URL is an IPFS hash
     if (!URL.startsWith(IPFSResolverPrefix) && !URL.startsWith('http')) {
       try {
         await fetch(`${IPFSResolverPrefix}${URL}`);
         // If it follows the XLS-24 standard, it will be automatically parsed
-        return parseJSON(`${IPFSResolverPrefix}${URL}`, NFTokenID);
+        return parseJSON(`${IPFSResolverPrefix}${URL}`, data.NFTokenID);
       } catch (e) {}
     }
   }
   // Case 3 - Return the raw NFT attributes
   return {
-    NFTokenID,
+    NFTokenID: data.NFTokenID,
     description: URL.replace(IPFSResolverPrefix, 'ipfs://')
   };
 };
